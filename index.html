@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Size Converter Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#f5f4f0;--surface:#ffffff;--surface2:#f0ede8;--border:#e2ddd8;
+      --text:#1a1917;--muted:#6b6860;--accent:#2563eb;--accent-bg:#eff6ff;
+      --success:#16a34a;--success-bg:#f0fdf4;--warn:#d97706;--warn-bg:#fffbeb;
+      --danger:#dc2626;--danger-bg:#fef2f2;--radius:10px;--radius-lg:14px;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:2rem 1rem;}
+    .container{max-width:700px;margin:0 auto;}
+    h1{font-size:22px;font-weight:600;margin-bottom:4px;}
+    .subtitle{font-size:14px;color:var(--muted);margin-bottom:1.5rem;}
+    .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem;}
+    .metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;}
+    .metric-label{font-size:12px;color:var(--muted);margin-bottom:4px;}
+    .metric-val{font-size:20px;font-weight:600;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+    .card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 12px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:5px;}
+    input[type=number],select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-size:14px;background:var(--surface);color:var(--text);outline:none;transition:border-color .15s;}
+    input[type=number]:focus,select:focus{border-color:var(--accent);}
+    input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;}
+    input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;}
+    button{font-family:inherit;font-size:14px;font-weight:500;padding:9px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:background .15s,transform .1s;}
+    button:hover{background:var(--surface2);}
+    button:active{transform:scale(.98);}
+    .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);width:100%;padding:11px;font-size:15px;}
+    .btn-primary:hover{background:#1d4ed8;}
+    .btn-sm{font-size:12px;padding:5px 10px;}
+    .swap-btn{padding:9px 12px;font-size:18px;align-self:flex-end;margin-bottom:1px;}
+    .preset-cat{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 5px;display:block;}
+    .preset-wrap{display:flex;flex-wrap:wrap;gap:6px;}
+    .preset-btn{font-size:12px;padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;}
+    .preset-btn:hover{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+    .badge{display:inline-block;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px;margin-bottom:10px;}
+    .badge-ok{background:var(--success-bg);color:var(--success);}
+    .badge-warn{background:var(--warn-bg);color:var(--warn);}
+    .badge-err{background:var(--danger-bg);color:var(--danger);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    th{text-align:left;padding:6px 0;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);}
+    th:not(:first-child){text-align:right;}
+    td{padding:8px 0;border-bottom:1px solid var(--border);}
+    td:not(:first-child){text-align:right;}
+    tr:last-child td{border-bottom:none;}
+    .card-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    .ar-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+    .dpi-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px;}
+    .hist-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;transition:color .1s;}
+    .hist-row:last-child{border-bottom:none;}
+    .hist-row:hover{color:var(--accent);}
+    .hist-meta{font-size:12px;color:var(--muted);}
+    .empty{font-size:13px;color:var(--muted);}
+
+    /* Upload zone */
+    .upload-zone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:2rem 1rem;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:1rem;position:relative;}
+    .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-bg);}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .upload-icon{font-size:36px;margin-bottom:8px;}
+    .upload-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+    .upload-sub{font-size:12px;color:var(--muted);}
+    .preview-wrap{display:none;gap:12px;align-items:flex-start;margin-bottom:1rem;background:var(--surface2);border-radius:var(--radius);padding:10px;}
+    .preview-wrap.show{display:flex;}
+    .preview-img{width:80px;height:80px;object-fit:contain;border-radius:6px;border:1px solid var(--border);background:#fff;}
+    .preview-info{flex:1;}
+    .preview-name{font-size:13px;font-weight:600;margin-bottom:4px;word-break:break-all;}
+    .preview-meta{font-size:12px;color:var(--muted);line-height:1.8;}
+    .clear-img{font-size:12px;padding:4px 8px;align-self:flex-start;}
+    @media(max-width:500px){.grid2{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🖼 Image Size Converter Pro</h1>
+  <p class="subtitle">Image upload karein ya manually enter karein — px, inches, cm, mm sab convert karein</p>
+
+  <div class="metrics">
+    <div class="metric"><p class="metric-label">Width</p><p class="metric-val" id="out-w">1920 px</p></div>
+    <div class="metric"><p class="metric-label">Height</p><p class="metric-val" id="out-h">1080 px</p></div>
+    <div class="metric"><p class="metric-label">Orientation</p><p class="metric-val" id="out-orient">🖥 Landscape</p></div>
+    <div class="metric"><p class="metric-label">File size (est.)</p><p class="metric-val" id="out-fsize">5.93 MB</p></div>
+  </div>
+
+  <!-- Upload -->
+  <div class="card">
+    <p class="card-title">Image Upload — Auto Detect</p>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="img-input" accept="image/*" />
+      <div class="upload-icon">📂</div>
+      <p class="upload-text">Image yahan drop karein ya click karein</p>
+      <p class="upload-sub">PNG, JPG, WEBP, GIF — width & height auto detect hoga</p>
+    </div>
+    <div class="preview-wrap" id="preview-wrap">
+      <img id="preview-img" class="preview-img" src="" alt="preview" />
+      <div class="preview-info">
+        <p class="preview-name" id="preview-name">—</p>
+        <p class="preview-meta" id="preview-meta">—</p>
+      </div>
+      <button class="clear-img" onclick="clearImage()">✕ Remove</button>
+    </div>
+  </div>
+
+  <!-- Presets -->
+  <div class="card">
+    <p class="card-title">Quick Presets</p>
+    <div id="preset-container"></div>
+  </div>
+
+  <!-- Inputs -->
+  <div class="card">
+    <p class="card-title">Dimensions</p>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:flex-end;margin-bottom:10px;">
+      <div><label>Width</label><input type="number" id="inp-w" value="1920" min="1"/></div>
+      <button class="swap-btn" onclick="swapDims()" title="Swap">⇄</button>
+      <div><label>Height</label><input type="number" id="inp-h" value="1080" min="1"/></div>
+    </div>
+    <div class="grid2" style="margin-bottom:10px;">
+      <div><label>Input unit</label>
+        <select id="from-unit">
+          <option value="px">Pixels (px)</option><option value="in">Inches (in)</option>
+          <option value="cm">Centimeters (cm)</option><option value="mm">Millimeters (mm)</option>
+          <option value="pt">Points (pt)</option>
+        </select>
+      </div>
+      <div><label>Output unit</label>
+        <select id="to-unit">
+          <option value="px" selected>Pixels (px)</option><option value="in">Inches (in)</option>
+          <option value="cm">Centimeters (cm)</option><option value="mm">Millimeters (mm)</option>
+          <option value="pt">Points (pt)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:10px;">
+      <div><label>Color mode</label>
+        <select id="color-mode">
+          <option value="3">RGB (3 channels)</option><option value="4">CMYK (4 channels)</option>
+          <option value="1">Grayscale (1 channel)</option>
+        </select>
+      </div>
+      <div><label>Format</label>
+        <select id="fmt-sel">
+          <option value="png">PNG</option><option value="jpg">JPG</option>
+          <option value="tiff">TIFF</option><option value="bmp">BMP</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label>DPI / PPI — <span id="dpi-val">72</span></label>
+      <input type="range" id="dpi-slider" min="72" max="600" step="1" value="72"/>
+      <div class="dpi-labels"><span>72 (screen)</span><span>150</span><span>300 (print)</span><span>600</span></div>
+    </div>
+    <div class="ar-row">
+      <input type="checkbox" id="ar-lock"/>
+      <label for="ar-lock" style="cursor:pointer;">Lock aspect ratio</label>
+      <span style="font-size:12px;color:var(--muted);" id="ar-display"></span>
+    </div>
+    <button class="btn-primary" onclick="convert()">Convert →</button>
+  </div>
+
+  <!-- Results -->
+  <div class="card">
+    <div class="card-row">
+      <p class="card-title" style="margin:0;">All Conversions</p>
+      <button class="btn-sm" onclick="copyAll()" id="copy-btn">📋 Copy</button>
+    </div>
+    <div id="resolution-badge"></div>
+    <table>
+      <thead><tr><th>Unit</th><th>Width</th><th>Height</th></tr></thead>
+      <tbody id="all-body"></tbody>
+    </table>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <div class="card-row">
+      <p class="card-title" style="margin:0;">History</p>
+      <button class="btn-sm" onclick="clearHistory()">🗑 Clear</button>
+    </div>
+    <div id="hist-list"><p class="empty">No conversions yet.</p></div>
+  </div>
+</div>
+
+<script>
+const presets={
+  "Print":[{name:"A4",w:2480,h:3508,unit:"px",dpi:300},{name:"A3",w:3508,h:4961,unit:"px",dpi:300},{name:"A5",w:1748,h:2480,unit:"px",dpi:300},{name:"Letter",w:2550,h:3300,unit:"px",dpi:300}],
+  "Social Media":[{name:"Instagram Post",w:1080,h:1080,unit:"px",dpi:72},{name:"Instagram Story",w:1080,h:1920,unit:"px",dpi:72},{name:"Facebook Cover",w:820,h:312,unit:"px",dpi:72},{name:"Twitter Header",w:1500,h:500,unit:"px",dpi:72},{name:"LinkedIn Cover",w:1584,h:396,unit:"px",dpi:72}],
+  "Video":[{name:"YouTube Thumb",w:1280,h:720,unit:"px",dpi:72},{name:"Full HD 1080p",w:1920,h:1080,unit:"px",dpi:72},{name:"4K UHD",w:3840,h:2160,unit:"px",dpi:72}],
+  "Web":[{name:"Favicon",w:32,h:32,unit:"px",dpi:72},{name:"OG Image",w:1200,h:630,unit:"px",dpi:72},{name:"Banner 728x90",w:728,h:90,unit:"px",dpi:72}]
+};
+const pc=document.getElementById('preset-container');
+for(const[cat,items]of Object.entries(presets)){
+  const s=document.createElement('span');s.className='preset-cat';s.textContent=cat;pc.appendChild(s);
+  const row=document.createElement('div');row.className='preset-wrap';
+  items.forEach(p=>{const b=document.createElement('button');b.className='preset-btn';b.textContent=p.name;b.onclick=()=>applyPreset(p);row.appendChild(b);});
+  pc.appendChild(row);
+}
+function applyPreset(p){document.getElementById('inp-w').value=p.w;document.getElementById('inp-h').value=p.h;document.getElementById('from-unit').value=p.unit;document.getElementById('dpi-slider').value=p.dpi;document.getElementById('dpi-val').textContent=p.dpi;updateAR();convert();}
+document.getElementById('dpi-slider').addEventListener('input',function(){document.getElementById('dpi-val').textContent=this.value;});
+let arRatio=null;
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function updateAR(){const w=parseFloat(document.getElementById('inp-w').value)||1,h=parseFloat(document.getElementById('inp-h').value)||1;arRatio=w/h;const g=gcd(Math.round(w),Math.round(h));document.getElementById('ar-display').textContent=`(${Math.round(w/g)}:${Math.round(h/g)})`;}
+document.getElementById('inp-w').addEventListener('input',()=>{if(document.getElementById('ar-lock').checked&&arRatio)document.getElementById('inp-h').value=Math.round((parseFloat(document.getElementById('inp-w').value)||0)/arRatio);updateAR();});
+document.getElementById('inp-h').addEventListener('input',()=>{if(document.getElementById('ar-lock').checked&&arRatio)document.getElementById('inp-w').value=Math.round((parseFloat(document.getElementById('inp-h').value)||0)*arRatio);updateAR();});
+document.getElementById('ar-lock').addEventListener('change',updateAR);
+function swapDims(){const w=document.getElementById('inp-w').value,h=document.getElementById('inp-h').value;document.getElementById('inp-w').value=h;document.getElementById('inp-h').value=w;updateAR();convert();}
+function toPx(v,u,d){switch(u){case'px':return v;case'in':return v*d;case'cm':return v*d/2.54;case'mm':return v*d/25.4;case'pt':return v*d/72;}}
+function fromPx(p,u,d){switch(u){case'px':return p;case'in':return p/d;case'cm':return p*2.54/d;case'mm':return p*25.4/d;case'pt':return p*72/d;}}
+function fmt(v,u){if(u==='px'||u==='pt')return Math.round(v).toString();return parseFloat(v.toFixed(2)).toString();}
+function fileSizeEst(w,h,ch,f){const raw=w*h*ch;let b=f==='jpg'?raw*.1:f==='png'?raw*.5:raw;if(b<1024)return b.toFixed(0)+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB';}
+function orientIcon(w,h){return w>h?'🖥 Landscape':h>w?'📄 Portrait':'⬛ Square';}
+function resoBadge(dpi){if(dpi>=300)return['badge-ok','✓ Print quality (300+ DPI)'];if(dpi>=150)return['badge-warn','⚠ Low print quality (150 DPI)'];return['badge-err','✗ Screen only — not for print'];}
+let history=[];
+function convert(){
+  const w=parseFloat(document.getElementById('inp-w').value)||0,h=parseFloat(document.getElementById('inp-h').value)||0;
+  const fromUnit=document.getElementById('from-unit').value,toUnit=document.getElementById('to-unit').value;
+  const dpi=parseInt(document.getElementById('dpi-slider').value),ch=parseInt(document.getElementById('color-mode').value),f=document.getElementById('fmt-sel').value;
+  const wPx=toPx(w,fromUnit,dpi),hPx=toPx(h,fromUnit,dpi),wOut=fromPx(wPx,toUnit,dpi),hOut=fromPx(hPx,toUnit,dpi);
+  document.getElementById('out-w').textContent=fmt(wOut,toUnit)+' '+toUnit;
+  document.getElementById('out-h').textContent=fmt(hOut,toUnit)+' '+toUnit;
+  document.getElementById('out-orient').textContent=orientIcon(wPx,hPx);
+  document.getElementById('out-fsize').textContent=fileSizeEst(wPx,hPx,ch,f);
+  const[cls,txt]=resoBadge(dpi);document.getElementById('resolution-badge').innerHTML=`<span class="badge ${cls}">${txt}</span>`;
+  const units=['px','in','cm','mm','pt'],labels={px:'Pixels',in:'Inches',cm:'Centimeters',mm:'Millimeters',pt:'Points'};
+  const tbody=document.getElementById('all-body');tbody.innerHTML='';
+  units.forEach(u=>{const rw=fromPx(wPx,u,dpi),rh=fromPx(hPx,u,dpi),bold=u===toUnit?'600':'400';const tr=document.createElement('tr');tr.innerHTML=`<td style="padding:8px 0;color:var(--muted);">${labels[u]}</td><td style="text-align:right;padding:8px 0;font-weight:${bold};">${fmt(rw,u)}</td><td style="text-align:right;padding:8px 0;font-weight:${bold};">${fmt(rh,u)}</td>`;tbody.appendChild(tr);});
+  history.unshift({w:fmt(wOut,toUnit),h:fmt(hOut,toUnit),unit:toUnit,dpi,wIn:w,hIn:h,fromUnit});
+  if(history.length>10)history.pop();renderHistory();updateAR();
+}
+function renderHistory(){const el=document.getElementById('hist-list');if(!history.length){el.innerHTML='<p class="empty">No conversions yet.</p>';return;}el.innerHTML='';history.forEach((h,i)=>{const row=document.createElement('div');row.className='hist-row';row.title='Click to restore';row.innerHTML=`<span>${h.wIn}×${h.hIn} ${h.fromUnit} → <strong>${h.w}×${h.h} ${h.unit}</strong></span><span class="hist-meta">${h.dpi} DPI</span>`;row.onclick=()=>restoreHistory(i);el.appendChild(row);});}
+function restoreHistory(i){const h=history[i];document.getElementById('inp-w').value=h.wIn;document.getElementById('inp-h').value=h.hIn;document.getElementById('from-unit').value=h.fromUnit;document.getElementById('to-unit').value=h.unit;document.getElementById('dpi-slider').value=h.dpi;document.getElementById('dpi-val').textContent=h.dpi;convert();}
+function clearHistory(){history=[];renderHistory();}
+function copyAll(){const rows=document.querySelectorAll('#all-body tr');let text='Unit\tWidth\tHeight\n';rows.forEach(r=>{const c=r.querySelectorAll('td');text+=`${c[0].textContent}\t${c[1].textContent}\t${c[2].textContent}\n`;});navigator.clipboard.writeText(text).then(()=>{const b=document.getElementById('copy-btn');b.textContent='✅ Copied!';setTimeout(()=>{b.textContent='📋 Copy';},1500);});}
+
+// Image Upload
+const imgInput=document.getElementById('img-input');
+const uploadZone=document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('drag');});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('drag');const file=e.dataTransfer.files[0];if(file&&file.type.startsWith('image/'))processImage(file);});
+imgInput.addEventListener('change',function(){if(this.files[0])processImage(this.files[0]);});
+function processImage(file){
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=function(){
+    const w=img.naturalWidth,h=img.naturalHeight;
+    document.getElementById('inp-w').value=w;document.getElementById('inp-h').value=h;
+    document.getElementById('from-unit').value='px';
+    const ext=file.name.split('.').pop().toUpperCase();
+    if(ext==='JPG'||ext==='JPEG')document.getElementById('fmt-sel').value='jpg';
+    else if(ext==='PNG')document.getElementById('fmt-sel').value='png';
+    else if(ext==='TIFF'||ext==='TIF')document.getElementById('fmt-sel').value='tiff';
+    const sizeMB=file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(2)+' MB';
+    document.getElementById('preview-img').src=url;
+    document.getElementById('preview-name').textContent=file.name;
+    document.getElementById('preview-meta').innerHTML=`Actual size: <strong>${w} × ${h} px</strong><br>File size: <strong>${sizeMB}</strong><br>Type: <strong>${file.type}</strong>`;
+    document.getElementById('preview-wrap').classList.add('show');
+    updateAR();convert();URL.revokeObjectURL(url);
+  };img.src=url;
+}
+function clearImage(){document.getElementById('preview-wrap').classList.remove('show');document.getElementById('preview-img').src='';document.getElementById('img-input').value='';}
+convert();
+</script>
+</body>
+</html>
